@@ -28,50 +28,48 @@ ta_test = [np.ones_like(
     group[[1], :]) * ta for group, ta in zip(x_test, [110, 90, 70])]
 pass
 
+
 def mylog(x):
     return np.log(np.clip(x, 1e-40, 1e10))
-
-
-def fun1(x, lnk0, ed):
-    return lnk0 - ed / (r * x[0])
 
 
 def fun2(x, lnk0, ed):
     return lnk0 - ed / (r * x[0])
 
 
-def fun3(x, lnk0, a, b, ed):
+def fun3(x, lnk0, ed):
+    return lnk0 - ed / (r * x[0])
+
+
+def fun4(x, lnk0, a, b, ed):
     return lnk0 + a * x[1] - (ed + b * x[1]) / (r * x[0])
 
 
-def fun4(x, lnk0, a, ed):
+def fun5(x, lnk0, a, ed):
     return lnk0 + mylog(1 + a * x[3]) - ed / (r * x[0])
 
 
-def fun5(x, lnk0, a, b, ed):
+def fun6(x, lnk0, a, b, ed):
     return lnk0 + mylog(1 + a * x[2]) + mylog(1 + b * x[3]) - ed / (r * x[0])
 
 
-def fun6(x, lnk0, a, b, ed):
+def fun7(x, lnk0, a, b, ed):
     return lnk0 + mylog(1 + a * x[3] + b * x[3] ** 2) - ed / (r * x[0])
 
 
-def fun7(x, lnk0, a, b, ed):
+def fun8(x, lnk0, a, b, ed):
     return lnk0 + a * x[1] - (ed + b * x[0]) / (r * x[0])
 
 
-def fun8(x, lnk0, a, b, ed):
+def fun9(x, lnk0, a, b, ed):
     return lnk0 + a * x[0] - (ed + b * x[1]) / (r * x[0])
 
 
-def fun9(x, lnk0, a, b, ed):
+def fun10(x, lnk0, a, b, ed):
     return lnk0 + mylog(1 + a * x[2]) + b * x[1] - ed / (r * x[1])
 
 
-# # Model 2-9
-# fun = fun2
-# Model 1
-fun = fun1
+fun = fun2
 x_reg = ta_reg
 x_rst = ta_rst
 x_test = ta_test
@@ -92,6 +90,7 @@ for i in range(6):
     pred_lg = np.log10(pred)
     r2_lg = r2_score(np.log10(s_gt[i]), pred_lg[tag_rst[i]])
     r2_fit_lg.append(r2_lg)
+#
 # test acc
 r2_test_lnr, r2_test_lg = [], []
 for i in range(3):

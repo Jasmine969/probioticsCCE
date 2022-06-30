@@ -3,7 +3,7 @@ import numpy as np
 
 writer = pd.ExcelWriter('excel\\raw_1s.xlsx')
 # 前六组
-params6 = {'io': 'excel\\1_乳酸菌 数据.xlsx', 'sheet_name': 'Sheet5', 'header': 1}
+params6 = {'io': 'excel\\RawG1-G6.xlsx', 'sheet_name': 'Sheet5', 'header': 1}
 cols6 = ['AB:AF', 'AK:AO', 'AS:AW', 'D:H', 'L:P', 'T:X']
 rows6 = [270, 270, 120, 300, 300, 120]
 for i in range(6):
@@ -14,7 +14,7 @@ for i in range(6):
     df6.to_excel(writer, index=None, sheet_name='Sheet' + str(i + 1))
 
 # 后两组
-file_name2 = 'excel\\LLC数据汇总-最终版.xlsx'
+file_name2 = 'excel/RawG7-G8.xlsx'
 sheet_name2 = ['1ul', '2ul']
 for i in range(7, 9):
     df2 = pd.read_excel(file_name2, sheet_name=sheet_name2[i - 7], usecols='A:C,M', nrows=402, header=3)

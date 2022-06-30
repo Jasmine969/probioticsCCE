@@ -8,6 +8,8 @@ from torch.nn.utils import rnn
 from matplotlib import font_manager as fm, pyplot as plt
 from sklearn.metrics import r2_score
 from copy import deepcopy as dc
+import sympy as sp
+from sympy.matrices import dense
 
 
 def collect_fn_added(data):
@@ -337,3 +339,17 @@ def kd2s(kd):
     s = 1 / np.cumprod(1 + kd)
     s = np.hstack(([1], s))
     return s
+
+
+def least_square(x, y):
+    """
+    x: input matrix, np.array
+    y: output matrix, np.array
+    return: coefficient
+    """
+    y = y.flatten()  # in case that y is a row vector
+    assert y.ndim == 1
+    y = y[..., None]
+    res = sp.Matrix(np.c_[np.dot(x.T, x), np.dot(x.T, y)]).rref()[0]
+    res = dense.matrix2numpy(res)
+    return res[:, -1]

@@ -3,7 +3,7 @@ from matplotlib import pyplot as plt
 
 # 主要进行merge操作
 file_ft = 'excel\\raw_1s.xlsx'
-file_s = 'excel\\1_乳酸菌 数据.xlsx'
+file_s = 'excel/RawG1-G6.xlsx'
 headers = [4, 18, 32, 41, 56, 71, 80, 92]
 nrows = [12, 12, 7, 13, 13, 7, 10, 10]
 writer = pd.ExcelWriter('excel\\raw_ft_s.xlsx')
