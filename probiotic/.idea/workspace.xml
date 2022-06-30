@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="ad277037-a638-4ffa-b163-4b74aceaced9" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/probiotic.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/attn_train_tower.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/trained_models/test35/no_added_files/vali6/lgs_non-tilde_itpw0/tensorboard_res/accuracy_train/events.out.tfevents.1639989906.LAPTOP-1QA0JPIO.13296.1" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/trained_models/test35/no_added_files/vali6/lgs_non-tilde_itpw0/tensorboard_res/accuracy_train/events.out.tfevents.1639990687.LAPTOP-1QA0JPIO.23860.1" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/trained_models/test35/no_added_files/vali6/lgs_non-tilde_itpw0/tensorboard_res/accuracy_vali/events.out.tfevents.1639989906.LAPTOP-1QA0JPIO.13296.2" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/trained_models/test35/no_added_files/vali6/lgs_non-tilde_itpw0/tensorboard_res/accuracy_vali/events.out.tfevents.1639990687.LAPTOP-1QA0JPIO.23860.2" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/trained_models/test35/no_added_files/vali6/lgs_non-tilde_itpw0/tensorboard_res/events.out.tfevents.1639989899.LAPTOP-1QA0JPIO.13296.0" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/trained_models/test35/no_added_files/vali6/lgs_non-tilde_itpw0/tensorboard_res/events.out.tfevents.1639989931.LAPTOP-1QA0JPIO.21372.0" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/trained_models/test35/no_added_files/vali6/lgs_non-tilde_itpw0/tensorboard_res/events.out.tfevents.1639990682.LAPTOP-1QA0JPIO.23860.0" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/trained_models/test35/no_added_files/vali6/lgs_non-tilde_itpw0/tensorboard_res/events.out.tfevents.1639990713.LAPTOP-1QA0JPIO.11292.0" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/trained_models/test35/no_added_files/vali6/tower2/lgs_non-tilde_trial/tensorboard_res/events.out.tfevents.1640004420.LAPTOP-1QA0JPIO.11280.0" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/trained_models/test35/no_added_files/vali6/tower2/lgs_non-tilde_trial/tensorboard_res/events.out.tfevents.1640004468.LAPTOP-1QA0JPIO.22700.0" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/trained_models/test35/no_added_files/vali6/tower2/lgs_non-tilde_trial/tensorboard_res/events.out.tfevents.1640004488.LAPTOP-1QA0JPIO.21824.0" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/trained_models/test35/no_added_files/vali6/tower2/lgs_non-tilde_trial/tensorboard_res/events.out.tfevents.1640004520.LAPTOP-1QA0JPIO.9820.0" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/trained_models/test35/no_added_files/vali6/tower2/lgs_non-tilde_trial/tensorboard_res/events.out.tfevents.1640004557.LAPTOP-1QA0JPIO.22860.0" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/trained_models/test35/no_added_files/vali6/tower2/lgs_non-tilde_trial/tensorboard_res/events.out.tfevents.1640004578.LAPTOP-1QA0JPIO.23688.0" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/trained_models/test35/no_added_files/vali6/tower2/lgs_non-tilde_trial/tensorboard_res/events.out.tfevents.1640004601.LAPTOP-1QA0JPIO.22656.0" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/trained_models/test35/no_added_files/vali6/tower2/lgs_non-tilde_trial/tensorboard_res/events.out.tfevents.1640004676.LAPTOP-1QA0JPIO.2192.0" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/trained_models/test35/no_added_files/vali6/tower2/lgs_non-tilde_trial/tensorboard_res/events.out.tfevents.1640004696.LAPTOP-1QA0JPIO.12768.0" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/trained_models/test35/no_added_files/vali6/tower2/s_non-tilde_trial/tensorboard_res/accuracy_train/events.out.tfevents.1640007127.LAPTOP-1QA0JPIO.6944.1" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/trained_models/test35/no_added_files/vali6/tower2/s_non-tilde_trial/tensorboard_res/accuracy_vali/events.out.tfevents.1640007127.LAPTOP-1QA0JPIO.6944.2" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/trained_models/test35/no_added_files/vali6/tower2/s_non-tilde_trial/tensorboard_res/events.out.tfevents.1640005991.LAPTOP-1QA0JPIO.22192.0" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/trained_models/test35/no_added_files/vali6/tower2/s_non-tilde_trial/tensorboard_res/events.out.tfevents.1640006005.LAPTOP-1QA0JPIO.19764.0" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/trained_models/test35/no_added_files/vali6/tower2/s_non-tilde_trial/tensorboard_res/events.out.tfevents.1640006282.LAPTOP-1QA0JPIO.7100.0" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/trained_models/test35/no_added_files/vali6/tower2/s_non-tilde_trial/tensorboard_res/events.out.tfevents.1640006392.LAPTOP-1QA0JPIO.17700.0" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/trained_models/test35/no_added_files/vali6/tower2/s_non-tilde_trial/tensorboard_res/events.out.tfevents.1640006799.LAPTOP-1QA0JPIO.16872.0" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/trained_models/test35/no_added_files/vali6/tower2/s_non-tilde_trial/tensorboard_res/events.out.tfevents.1640007124.LAPTOP-1QA0JPIO.6944.0" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/trained_models/test35/no_added_files/vali6/tower2/s_non-tilde_trial/tensorboard_res/events.out.tfevents.1640007219.LAPTOP-1QA0JPIO.18212.0" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/trained_models/test35/no_added_files/vali6/tower2/s_non-tilde_trial/tensorboard_res/events.out.tfevents.1640007246.LAPTOP-1QA0JPIO.3996.0" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/trained_models/test35/no_added_files/vali6/tower2/s_non-tilde_trial/tensorboard_res/events.out.tfevents.1640007326.LAPTOP-1QA0JPIO.20972.0" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../multitask/multi-task-learning-example-PyTorch-master/multi-task-learning-example-PyTorch.py" beforeDir="false" afterPath="$PROJECT_DIR$/../multitask/multi-task-learning-example-PyTorch-master/multi-task-learning-example-PyTorch.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../my_functions.py" beforeDir="false" afterPath="$PROJECT_DIR$/../my_functions.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/MyNN.py" beforeDir="false" afterPath="$PROJECT_DIR$/MyNN.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/attn_train.py" beforeDir="false" afterPath="$PROJECT_DIR$/attn_train.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../trainers.py" beforeDir="false" afterPath="$PROJECT_DIR$/../trainers.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../drafts/draft1.py" beforeDir="false" afterPath="$PROJECT_DIR$/../../drafts/draft1.py" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/../.." />
+  </component>
+  <component name="ProjectId" id="22YHZrBXZ2sOUiT9uoKAPjTDYXu" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="ad277037-a638-4ffa-b163-4b74aceaced9" name="Default Changelist" comment="" />
+      <created>1640007658725</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1640007658725</updated>
+      <workItem from="1640007659918" duration="38000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+</project>

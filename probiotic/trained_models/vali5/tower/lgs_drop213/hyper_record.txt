@@ -1,0 +1,14 @@
+batch_size: 2
+epoch_num: 2000
+learning_rate: 0.000568
+weight_decay: 0.000227
+flooding: 0.003881
+threshold: 0.6666666666666666
+itp_weight: 0.291
+dk: 114
+dv: 123
+num_heads: 1
+dropout: 0.214
+act_name: leakyrelu
+
+max_vali_acc: 0.9461, train_sync_acc: 0.9739
