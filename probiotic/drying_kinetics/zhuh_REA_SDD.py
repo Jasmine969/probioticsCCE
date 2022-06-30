@@ -165,7 +165,7 @@ def sdd(l, w, Ta, pMass0, dp0, va, ms, ws, Y):
     # -----------------------------------
     # C1 = 1.63 + 0.54 * (va * rho / mu) ** 0.5 * Sc ** (1 / 3)
     # print(1)
-    # wb = opx.load_workbook('E:\\python_code\\probioticsCCE\\probiotic\\vary_inp_test\\vd1.xlsx')
+    # wb = opx.load_workbook('E:\\probioticsCCE\\probiotic\\vary_inp_test\\vd1.xlsx')
     # ws = wb['Sheet3']
     # write_data = [C1, diameter, hm, -dmdt, Ap, rhoS, rhoF, rhoS-rhoF]
     # row = ws.max_row + 1

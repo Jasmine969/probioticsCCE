@@ -1,11 +1,10 @@
-from probioticsCCE.probiotic.gen_bag_model import gen_bag
+from probiotic.gen_bag_model import gen_bag
 import numpy as np
-import probioticsCCE.my_functions as mf
+import my_functions as mf
 import pickle
 import torch
 from torch.nn.utils import rnn
-from probioticsCCE.probiotic. \
-    drying_kinetics import zhuh_REA_SDD as ReaSdd
+from probiotic.drying_kinetics import zhuh_REA_SDD as ReaSdd
 from scipy.integrate import simps
 from itertools import product
 from tqdm import tqdm

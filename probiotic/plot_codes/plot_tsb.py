@@ -5,7 +5,7 @@ from functools import partial
 from brokenaxes import brokenaxes
 from matplotlib import font_manager as fm
 from copy import deepcopy as dc
-import probioticsCCE.my_functions as mf
+import my_functions as mf
 
 
 def read_tensorboard_data(tensorboard_path, val_name):

@@ -3,7 +3,7 @@ import numpy as np
 from matplotlib import pyplot as plt, font_manager as fm, colors
 import seaborn as sns
 from gen_bag_model import gen_bag
-from probioticsCCE.my_functions import visualize
+from my_functions import visualize
 from functools import partial
 
 

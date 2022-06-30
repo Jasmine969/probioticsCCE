@@ -2,7 +2,7 @@ import numpy as np
 import pickle
 from scipy import optimize
 from sklearn.metrics import r2_score
-import probioticsCCE.my_functions as mf
+import my_functions as mf
 from matplotlib import pyplot as plt
 
 with open('../pickle_data/for_other_models_dataset.pkl', 'rb') as pf:

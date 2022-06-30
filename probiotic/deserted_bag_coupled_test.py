@@ -5,7 +5,7 @@ from matplotlib import pyplot as plt, font_manager as fm, colors
 from MyNN import ConvAttention, CoupledModel, BaggingModel
 from torch.nn.utils import rnn
 from sklearn.metrics import r2_score
-import probioticsCCE.my_functions as mf
+import my_functions as mf
 from copy import deepcopy as dc
 import math
 import seaborn as sns

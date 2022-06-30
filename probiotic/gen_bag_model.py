@@ -1,5 +1,5 @@
 import torch
-from probioticsCCE.probiotic.MyNN import ConvAttn2Tower, BaggingModel
+from probiotic.MyNN import ConvAttn2Tower, BaggingModel
 
 
 def gen_bag(ops):
@@ -7,7 +7,7 @@ def gen_bag(ops):
         parent_path = '/data/zhuhong_codes/python_code/probioticsCCE/probiotic/'
         path = parent_path + 'optuna_res/test35/'
     else:
-        parent_path = 'E:/python_code/probioticsCCE/probiotic/'
+        parent_path = 'E:/probioticsCCE/probiotic/'
         path = parent_path + 'optuna_res/test35/'
     # vali1
     model1 = ConvAttn2Tower(

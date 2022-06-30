@@ -1,9 +1,9 @@
 import torch
 import pickle
 from torch import nn, optim
-from probioticsCCE.trainers import TrainerAttn2Tower
-from probioticsCCE.probiotic.MyNN import ConvAttn2Tower
-import probioticsCCE.my_functions as mf
+from trainers import TrainerAttn2Tower
+from probiotic.MyNN import ConvAttn2Tower
+import my_functions as mf
 from torch.utils.data import DataLoader
 
 with open('../../probiotic/pickle_data/test35_lgs_non-tilde.pkl', 'rb') as pf1:

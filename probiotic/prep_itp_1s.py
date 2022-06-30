@@ -2,7 +2,7 @@ from scipy.interpolate import PchipInterpolator as phicp
 import pandas as pd
 import numpy as np
 from matplotlib import pyplot as plt, font_manager as fm
-from probioticsCCE import my_functions as mf
+import my_functions as mf
 
 writer = pd.ExcelWriter('excel\\itp_ft_s.xlsx')
 font_title = fm.FontProperties(size=18, family='Times New Roman')

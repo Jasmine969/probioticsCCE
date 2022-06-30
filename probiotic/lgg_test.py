@@ -2,7 +2,7 @@ import pandas as pd
 import pickle
 import torch
 from gen_bag_model import gen_bag
-import probioticsCCE.my_functions as mf
+import my_functions as mf
 from torch.nn.utils import rnn
 from matplotlib import pyplot as plt, font_manager as fm
 import numpy as np

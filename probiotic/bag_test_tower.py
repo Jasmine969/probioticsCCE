@@ -4,11 +4,11 @@ import numpy as np
 from matplotlib import pyplot as plt, font_manager as fm, colors
 from torch.nn.utils import rnn
 from sklearn.metrics import r2_score
-import probioticsCCE.my_functions as mf
+import my_functions as mf
 import seaborn as sns
 from string import ascii_lowercase as lower_letter
 from gen_bag_model import gen_bag
-from probioticsCCE.my_functions import visualize
+from my_functions import visualize
 from functools import partial
 
 

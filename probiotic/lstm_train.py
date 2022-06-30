@@ -1,9 +1,9 @@
 import pickle
 from MyNN import MyLSTM
-from probioticsCCE.trainers import VaryLenInputTrainerLSTM
+from trainers import VaryLenInputTrainerLSTM
 from torch import nn, optim
 import math
-import probioticsCCE.my_functions as mf
+import my_functions as mf
 
 with open('pickle_data\\zscore_train_val_test_scalar.pkl', 'rb') as pf1:
     dct = pickle.load(pf1)

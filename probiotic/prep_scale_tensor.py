@@ -3,7 +3,7 @@ from sklearn.preprocessing import StandardScaler, MinMaxScaler
 import pandas as pd
 import pickle
 import numpy as np
-import probioticsCCE.my_functions as mf
+import my_functions as mf
 from matplotlib import pyplot as plt
 
 len_train_val, len_test = [], []  # record the length of each df for the following split

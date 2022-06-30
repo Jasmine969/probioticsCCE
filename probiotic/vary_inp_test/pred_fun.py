@@ -1,13 +1,12 @@
-from probioticsCCE.probiotic.gen_bag_model import gen_bag
+from probiotic.gen_bag_model import gen_bag
 import numpy as np
 from matplotlib import pyplot as plt, font_manager as fm
-import probioticsCCE.my_functions as mf
+import my_functions as mf
 import pickle
 import torch
 from torch.nn.utils import rnn
 from copy import deepcopy as dc
-from probioticsCCE.probiotic. \
-    drying_kinetics import zhuh_REA_SDD as ReaSdd
+from probiotic.drying_kinetics import zhuh_REA_SDD as ReaSdd
 from scipy.integrate import simps
 
 markers = ['o', 'v', '*', 'd', 's', '>', '|', '^', 'x', '.']

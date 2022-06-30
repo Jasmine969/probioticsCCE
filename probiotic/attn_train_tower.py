@@ -1,9 +1,9 @@
 import pickle
 import torch
 from MyNN import ConvAttn2Tower
-from probioticsCCE.trainers import TrainerAttn2Tower
+from trainers import TrainerAttn2Tower
 from torch import optim, nn
-from probioticsCCE import my_functions as mf
+import my_functions as mf
 import os
 
 # test group: 3 5
