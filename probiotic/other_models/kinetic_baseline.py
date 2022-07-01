@@ -19,8 +19,27 @@ data = [pd.read_excel('dsdt.xlsx', sheet_name='G' + str(
     i)) for i in [1, 2, 4, 6, 7, 8]]
 data = np.vstack(data)
 # least squared method
-k = mf.least_square(data[:, [0]], data[:, [1]])
-pred_dsdt = k * data[:,[0]]
-plt.scatter(data[:,[1]], pred_dsdt)
-print(f'r2={r2_score(data[:,[1]],pred_dsdt)}')
-plt.show()
+k = -mf.least_square(data[:, [0]], data[:, [1]])
+# split pred_dsdt by the group size
+pred_s_fit, pred_lgs_fit = [], []
+r2_fit_lnr, r2_fit_lg = [], []
+for i in range(6):
+    time_fit = (np.where(tag_rst[i])[0]).astype(float)
+    pred_lgs_fit.append(- k * time_fit / 2.303)
+    pred_s_fit.append(10 ** pred_lgs_fit[-1])
+    r2_fit_lnr.append(r2_score(s_gt[i], pred_s_fit[-1]))
+    r2_fit_lg.append(r2_score(np.log10(s_gt[i]), pred_lgs_fit[-1]))
+pred_s_test, pred_lgs_test = [], []
+r2_test_lnr, r2_test_lg = [], []
+for i in range(3):
+    time_test = (np.where(tag_test[i])[0]).astype(float)
+    pred_lgs_test.append(- k * time_test / 2.303)
+    pred_s_test.append(10 ** pred_lgs_test[-1])
+    r2_test_lnr.append(r2_score(s_test[i], pred_s_test[-1]))
+    r2_test_lg.append(r2_score(np.log10(s_test[i]), pred_lgs_test[-1]))
+print(f'k: {k}')
+print(f'r2_fit_lnr: {np.mean(r2_fit_lnr)}')
+print(f'r2_fit_lg: {np.mean(r2_fit_lg)}')
+print(f'r2_test_lnr: {np.mean(r2_test_lnr)}')
+print(f'r2_test_lg: {np.mean(r2_test_lg)}')
+

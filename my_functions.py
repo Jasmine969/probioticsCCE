@@ -351,5 +351,5 @@ def least_square(x, y):
     assert y.ndim == 1
     y = y[..., None]
     res = sp.Matrix(np.c_[np.dot(x.T, x), np.dot(x.T, y)]).rref()[0]
-    res = dense.matrix2numpy(res)
-    return res[:, -1]
+    res = dense.matrix2numpy(res).astype(float)
+    return res[0, -1]
