@@ -24,8 +24,8 @@ def comp_heatmap(ax):
         vmin=-11, vmax=1
     )
     mask = np.zeros_like(data)
-    mask[:, [8]] = 1
-    mask = mask.astype(np.bool)
+    mask[:, [9]] = 1
+    mask = mask.astype(bool)
     with sns.axes_style('white'):
         ax = sns.heatmap(
             data, ax=ax, vmax=.3,
@@ -33,7 +33,7 @@ def comp_heatmap(ax):
             annot=True, fmt='.4g',
             annot_kws=font_annot,
             norm=norm,
-            xticklabels=np.arange(13),
+            xticklabels=np.arange(14),
             yticklabels=np.arange(4),
             cbar=False,
             cmap='RdYlGn'

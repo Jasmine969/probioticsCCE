@@ -16,7 +16,7 @@ marker_sep = 20
 
 def vary_pred_plot(
         vary_param, exp_cond, labels, ops='win',
-        human_itv=True, clip_increase=True
+        human_itv=True, clip_increase=False
 ):
     """
     change one key and fix others experimental conditions,
@@ -51,9 +51,9 @@ def vary_pred_plot(
         left=0.18, right=0.971,
         top=0.974, bottom=0.138
     )
-    fig1, ax1 = plt.subplots()  # calc inactivation rate
-    ax1.set_xlabel('Time (s)', fontdict=font_text)
-    ax1.set_ylabel(r'$\Delta s/\Delta t$', fontproperties=font_formula)
+    # fig1, ax1 = plt.subplots()  # calc inactivation rate
+    # ax1.set_xlabel('Time (s)', fontdict=font_text)
+    # ax1.set_ylabel(r'$\Delta s/\Delta t$', fontproperties=font_formula)
     y_title = -0.4
     ax[1, 0].set_xlabel('Time (s)', fontdict=font_text)
     ax[1, 0].set_ylabel(r'$s$', fontproperties=font_formula)
@@ -115,27 +115,28 @@ def vary_pred_plot(
         # # ax[1, 0].plot(t[:-1], x[1:, 1] - x[:-1, 1], label=label) dT/dt
         ax[1, 1].plot(t, np.log10(pred), label=label, marker=marker,
                       markersize=markersize, markevery=marker_sep)
-        ax1.plot(t, rate, marker=marker,
-                 markersize=markersize, markevery=marker_sep)
+        # ax1.plot(t, rate, marker=marker,
+        #          markersize=markersize, markevery=marker_sep)
         # ax0.plot(t, np.log10(pred.flatten()), label=label, lw=2, marker=marker,
         #          markersize=markersize * 1.5, markevery=marker_sep)  # use in paper structure
     handles, labels = ax[0, 0].get_legend_handles_labels()
     fig.legend(handles, labels, loc='center left', prop=font_legend)
-    ax1.legend(handles, labels, loc='best', prop=font_legend)
+    # ax1.legend(handles, labels, loc='best', prop=font_legend)
     # ax[0, 0].legend(loc='best', prop=font_legend)
     # ax[0, 1].legend(loc='best', prop=font_legend)
     # ax[1, 0].legend(loc='best', prop=font_legend)
     # ax[1, 1].legend(loc='best', prop=font_legend)
     fig.set_size_inches([15.36, 7.57])
-    fig1.set_size_inches([9.04, 6.64])
-    return fig, ax, time_avg_rate, fig1, ax1
+    # fig1.set_size_inches([9.04, 6.64])
+    return fig, ax, \
+        # time_avg_rate, fig1, ax1
 
 
 if __name__ == '__main__':
     fig = vary_pred_plot('w_rsm', {
         'Ta': 100 + 273.15,
         'va': 0.8,
-        'w_rsm': [0.119,0.13,0.15],
+        'w_rsm': [0.119, 0.13, 0.15],
         'vd': 1.4e-9,
         'dur': [100]
     }, labels=['10%', '15%', '20%', '25%', '30%'])
