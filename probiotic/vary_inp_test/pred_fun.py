@@ -119,8 +119,8 @@ def vary_pred_plot(
         #          markersize=markersize, markevery=marker_sep)
         # ax0.plot(t, np.log10(pred.flatten()), label=label, lw=2, marker=marker,
         #          markersize=markersize * 1.5, markevery=marker_sep)  # use in paper structure
-    handles, labels = ax[0, 0].get_legend_handles_labels()
-    fig.legend(handles, labels, loc='center left', prop=font_legend)
+    # handles, labels = ax[0, 0].get_legend_handles_labels()
+    # fig.legend(handles, labels, loc='center left', prop=font_legend)
     # ax1.legend(handles, labels, loc='best', prop=font_legend)
     # ax[0, 0].legend(loc='best', prop=font_legend)
     # ax[0, 1].legend(loc='best', prop=font_legend)
