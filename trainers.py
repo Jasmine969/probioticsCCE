@@ -35,33 +35,18 @@ class SimpleTrainer:
         self.print_interval = print_interval
         self.device = device  # 'cpu' 'cuda'
         self.vali_acc_track = []
-        self.pgd = mf.MyPGD(self.net)
-        self.K = 3
         mf.setup_seed(seed)
 
     def _train(self):
         for xb_train, tb_train in self.train_dataloader:
-            xb_train.requires_grad_()
             predb_train = self.net(xb_train)
             loss_b = (self.criterion(predb_train, tb_train)
                       - self.flooding).abs() + self.flooding
+            self.optimizer.zero_grad()
             loss_b.backward()
-            # pgd
-            # self.pgd.backup_grad()
-            for t in range(self.K):
-                self.pgd.attack(inp=xb_train, is_first_attack=(t == 0))
-                if t != self.K - 1:
-                    self.net.zero_grad()
-                # else:
-                #     self.pgd.restore_grad()
-                predb_train = self.net(xb_train)
-                loss_adv = self.criterion(predb_train, tb_train)
-                loss_adv.backward()
-            # self.pgd.restore()
             torch.nn.utils.clip_grad_norm_(
                 self.net.parameters(), max_norm=3, norm_type=float('inf'))
             self.optimizer.step()
-            self.net.zero_grad()
 
     def _eval(self, x_train, x_vali, t_train, t_vali):
         with torch.no_grad():
@@ -172,10 +157,9 @@ class VaryLenInputTrainerLSTM(SimpleTrainer):
                       ) & (tb_cat[:, :, [2]] >= predb_cat)  # inside the feasible region
                 ] = 0  # deemed reliable and loss=0
             loss_b = (loss_b.mean() - self.flooding).abs() - self.flooding
-            loss_b.backward()
         return loss_b, predb, tb
 
-    def _itp_loss_acc(self, x_tb, length, epoch, calc_loss, if_bp=True):
+    def _itp_loss_acc(self, x_tb, length, epoch, calc_loss):
         loss, pred, t = self._itp_loss_calc(x_tb, length, calc_loss)
         normal_acc, lg_acc = [], []
         for pred_each, t_each in zip(pred, t):
@@ -198,8 +182,9 @@ class VaryLenInputTrainerLSTM(SimpleTrainer):
                 lg_acc if self.inv_trans_dict['lg_ori'] else normal_acc)
         return loss, torch.mean(total_acc).item()
 
-    def _optimization(self):
-        # loss_total.backward()
+    def _optimization(self, loss_total):
+        self.optimizer.zero_grad(set_to_none=True)
+        loss_total.backward()
         # count_grad = 0
         for each in self.net.parameters():
             # if each.grad is not None and each.grad.max().item() > 3:
@@ -210,7 +195,6 @@ class VaryLenInputTrainerLSTM(SimpleTrainer):
             torch.nn.utils.clip_grad_norm_(
                 each, max_norm=3, norm_type=float('inf'))
         self.optimizer.step()
-        self.optimizer.zero_grad(set_to_none=True)
 
     def _eval_var_len(self, epoch):
         with torch.no_grad():
@@ -245,7 +229,7 @@ class VaryLenInputTrainerLSTM(SimpleTrainer):
             self.net.train()
             for x_tb_train, length in self.train_dataloader:
                 loss_total, _, _ = self._itp_loss_calc(x_tb_train, length, calc_loss=True)
-                self._optimization()
+                self._optimization(loss_total)
             self.net.eval()
             loss, train_acc, vali_acc = self._eval_var_len(epoch)
             if self.writer is not None:
@@ -313,7 +297,7 @@ class VaryLenInputTrainerAttn(VaryLenInputTrainerLSTM):
         self.itp_weight = itp_weight
         self.last_weight = last_weight
 
-    def _itp_loss_calc(self, x_tb, length, calc_loss, if_bp=True):
+    def _itp_loss_calc(self, x_tb, length, calc_loss):
         xb, tb = x_tb.split([3, 2], dim=-1)
         tb = mf.my_pack(tb, length)
         predb, _ = self.net(xb, length)
@@ -339,7 +323,7 @@ class TrainerAttn2Tower(VaryLenInputTrainerAttn):
             itp_weight=1, last_weight=1,
             device='cuda', tsb_track=None,
             print_interval=5, early_stop=0,
-            threshold=None, pgd_epsilon=1., pgd_alpha=.3
+            threshold=None
     ):
         super(TrainerAttn2Tower, self).__init__(
             net, batch_size, num_epoch, optimizer, criterion,
@@ -354,15 +338,9 @@ class TrainerAttn2Tower(VaryLenInputTrainerAttn):
         self.best_nm_vali_acc = -2
         self.best_lg_train_acc = -2
         self.best_lg_vali_acc = -2
-        self.pgd_epsilon = pgd_epsilon
-        self.pgd_alpha = pgd_alpha
 
-    def _itp_loss_calc(self, x_tb, length, calc_loss, if_bp=True):
-        # if_bp specifies if backward propagation is implemented
+    def _itp_loss_calc(self, x_tb, length, calc_loss):
         xb, tb = x_tb.split([3, 2], dim=-1)
-        # ================= pgd
-        xb.requires_grad_()
-        # ----------------- pgd
         # tb1 = mf.my_pack(tb, length)  # normal + real tags
         # tb2 = [torch.log10(tbi[:, :, [0]]) for tbi in tb1]  # lg without real tags
         tb2 = mf.my_pack(tb, length)  # lg + real tags
@@ -376,40 +354,20 @@ class TrainerAttn2Tower(VaryLenInputTrainerAttn):
             tb1_cat = torch.cat(tb1, dim=1)
             predb2_cat = torch.cat(predb2, dim=1)
             tb2_cat = torch.cat(tb2, dim=1)
-
+            # loss_b = self.criterion(
+            #     (predb1_cat, predb2_cat),
+            #     (tb1_cat[:, :, [0]], tb2_cat[:, :, [0]])
+            # )
             loss_b = self.criterion(predb1_cat, tb1_cat[:, :, [0]]
                                     ) + self.criterion(predb2_cat, tb2_cat[:, :, [0]])
             real_tags = tb2_cat[:, :, [-1]].type(torch.bool)
             loss_b[~real_tags] = loss_b[~real_tags] * self.itp_weight  # weaken the influences of itp labels
             loss_b = (loss_b.mean() - self.flooding).abs() + self.flooding
-            if not if_bp:
-                return loss_b, predb, tb2
-            # ===============pgd
-            loss_b.backward()
-            for t_pgd in range(self.K):
-                self.pgd.attack(xb, epsilon=self.pgd_epsilon,
-                                alpha=self.pgd_alpha, is_first_attack=(t_pgd == 0))
-                if t_pgd != self.K - 1:
-                    self.optimizer.zero_grad()
-                    # xb.grad.zero_()
-                predb, (predb1, predb2), _ = self.net(xb, length)  # predb == [out1, out2]
-                predb1 = mf.my_pack(predb1, length)
-                predb2 = mf.my_pack(predb2, length)
-                predb1_cat = torch.cat(predb1, dim=1)
-                predb2_cat = torch.cat(predb2, dim=1)
-                loss_b = self.criterion(predb1_cat, tb1_cat[:, :, [0]]
-                                        ) + self.criterion(predb2_cat, tb2_cat[:, :, [0]])
-                real_tags = tb2_cat[:, :, [-1]].type(torch.bool)
-                loss_b[~real_tags] = loss_b[~real_tags] * self.itp_weight  # weaken the influences of itp labels
-                # loss_b = (loss_b.mean() - self.flooding).abs() + self.flooding
-                loss_b = loss_b.mean()
-                loss_b.backward()
-            # -------------pgd
         return loss_b, predb, tb2  # predb:normal tb2:lg
 
-    def _itp_loss_acc(self, x_tb, length, epoch, calc_loss, if_bp=True):
+    def _itp_loss_acc(self, x_tb, length, epoch, calc_loss):
         # pred (normal)
-        loss, pred, t = self._itp_loss_calc(x_tb, length, calc_loss, if_bp)
+        loss, pred, t = self._itp_loss_calc(x_tb, length, calc_loss)
         pred = mf.my_pack(pred, length)
         normal_acc, lg_acc = [], []
         for pred_each, t_each in zip(pred, t):
@@ -441,10 +399,10 @@ class TrainerAttn2Tower(VaryLenInputTrainerAttn):
         with torch.no_grad():
             for x_tb_eval_train, length in self.eval_train_dataloader:
                 loss, train_acc_normal, train_acc_lg = self._itp_loss_acc(
-                    x_tb_eval_train, length, epoch, calc_loss=True, if_bp=False)
+                    x_tb_eval_train, length, epoch, calc_loss=True)
             for x_tb_eval_vali, length in self.eval_vali_dataloader:
                 _, vali_acc_normal, vali_acc_lg = self._itp_loss_acc(
-                    x_tb_eval_vali, length, epoch, calc_loss=False, if_bp=False)
+                    x_tb_eval_vali, length, epoch, calc_loss=False)
         return loss, (train_acc_normal, vali_acc_normal), (train_acc_lg, vali_acc_lg)
 
     def train_var_len(self, x_t_train, x_t_vali):
@@ -472,7 +430,7 @@ class TrainerAttn2Tower(VaryLenInputTrainerAttn):
             self.net.train()
             for x_tb_train, length in self.train_dataloader:
                 loss_total, _, _ = self._itp_loss_calc(x_tb_train, length, calc_loss=True)
-                self._optimization()
+                self._optimization(loss_total)
             self.net.eval()
             loss, (train_acc_normal, vali_acc_normal
                    ), (train_acc_lg, vali_acc_lg) = self._eval_var_len(epoch)
@@ -537,3 +495,142 @@ class TrainerAttn2Tower(VaryLenInputTrainerAttn):
             'best_lg_vali_acc': self.best_lg_vali_acc,
             'max_vali_epoch': self.max_vali_epoch + 1
         }
+
+
+class VaryLenInputTrainerAttnAdded(VaryLenInputTrainerAttn):
+    def __init__(
+            self, net, batch_size, num_epoch, optimizer, criterion,
+            mode, flooding, seed=623, real_weight=1,  # weight of real label when calc loss
+            device='cuda', tsb_track=None,
+            print_interval=5, early_stop=0,
+            threshold=None, s_max=None, s_min=None
+    ):
+        super(VaryLenInputTrainerAttn, self).__init__(
+            net, batch_size, num_epoch, optimizer, criterion,
+            mode, flooding, seed,  # acc_mode: 'normal' or 'log' when calc. R2
+            device, tsb_track, print_interval, early_stop,
+            threshold=threshold, s_max=s_max, s_min=s_min
+        )
+        self.real_weight = real_weight
+        self.second_best_net = None
+
+    def _pred(self, x_tb, length):
+        xb, tb = x_tb.split([3, 2], dim=-1)
+        tb = mf.my_pack(tb, length, out_last=True)
+        predb = self.net(xb, length, self.mode)
+        predb = mf.my_pack(predb, length, out_last=True)
+        return predb, tb
+
+    def _itp_loss_calc_added(self, predb, tb):
+        predb_cat = torch.cat(predb, dim=1)
+        tb_cat = torch.cat(tb, dim=1)
+        loss_b = (self.criterion(predb_cat, tb_cat[:, :, [0]])
+                  - self.flooding).abs() + self.flooding
+        real_tags = tb_cat[:, :, [-1]].type(torch.bool)
+        loss_b[real_tags] = loss_b[real_tags] * self.real_weight  # underline the prediction of real labels
+        loss_b = loss_b.mean()
+        return loss_b
+
+    def _itp_loss_acc_added(self, pred, t, epoch, ind, lengths):
+        acc = []
+        pred, t = mf.sort_split_tv(pred, t, ind, lengths)
+        for pred_each, t_each in zip(pred, t):
+            if self.threshold is not None and epoch > int(self.num_epoch * self.threshold):
+                if epoch == int(self.num_epoch * self.threshold) + 1 and self.mode == 'train':
+                    print('\033[0;34mIntervention begins!\033[0m')
+                pred_each = mf.human_intervene(pred_each, self.s_max, self.s_min)
+            real_ind = t_each[:, :, -1].type(torch.bool).squeeze()
+            acc.append(r2_score(pred_each[:, real_ind, :].squeeze(),
+                                t_each[:, real_ind, 0].squeeze()))
+        return torch.mean(torch.Tensor(acc)).item()
+
+    def _eval_var_len(self, epoch):
+        with torch.no_grad():
+            # train_acc
+            pred, t, indices, lengths = [], [], [], []
+            for ind, x_tb_eval_train, length in self.eval_train_dataloader:
+                predb, tb = self._pred(x_tb_eval_train, length)
+                pred.extend(predb)
+                t.extend(tb)
+                indices.extend(ind)
+                lengths.extend(length)
+            loss = self._itp_loss_calc_added(pred, t)
+            train_acc = self._itp_loss_acc_added(pred, t, epoch, indices, lengths)
+            #  vali_acc
+            pred, t, indices = [], [], []
+            for ind, x_tb_eval_vali, length in self.eval_vali_dataloader:
+                predb, tb = self._pred(x_tb_eval_vali, length)
+                pred.extend(predb)
+                t.extend(tb)
+                indices.extend(ind)
+            vali_acc = self._itp_loss_acc_added(pred, t, epoch, indices, lengths)
+        return loss, train_acc, vali_acc
+
+    def train_var_len(self, x_t_train, x_t_vali):
+        t_0 = time.time()
+        x_t_train_ind, x_t_train = x_t_train
+        x_t_vali_ind, x_t_vali = x_t_vali
+        if self.device == 'cuda':
+            if x_t_train[0].device.type != 'cuda':
+                x_t_train = [x_each.cuda() for x_each in x_t_train]
+                x_t_vali = [x_each.cuda() for x_each in x_t_vali]
+            self.net.cuda()
+        self.train_dataloader = DataLoader(
+            mf.MyData(x_t_train, x_t_train_ind),
+            collate_fn=mf.collect_fn_added,
+            batch_size=self.batch_size, shuffle=True)
+        self.eval_train_dataloader = DataLoader(
+            mf.MyData(x_t_train, x_t_train_ind),
+            collate_fn=mf.collect_fn_added,
+            batch_size=400, shuffle=False)
+        self.eval_vali_dataloader = DataLoader(
+            mf.MyData(x_t_vali, x_t_vali_ind),
+            collate_fn=mf.collect_fn_added,
+            batch_size=400, shuffle=False)
+
+        for epoch in range(self.num_epoch) if \
+                self.mode == 'train' else tqdm(range(self.num_epoch)):
+            self.net.train()
+            for ind, x_tb_train, length in self.train_dataloader:
+                loss_total, _, _ = self._itp_loss_calc(x_tb_train, length, calc_loss=True)
+                self._optimization(loss_total)
+            self.net.eval()
+            loss, train_acc, vali_acc = self._eval_var_len(epoch)
+            if self.writer is not None:
+                self.writer.add_scalar('loss/epoch', loss, epoch + 1)
+                self.writer.add_scalars('accuracy', {'train': train_acc,
+                                                     'vali': vali_acc}, epoch + 1)
+            if self.mode == 'train':
+                if not (epoch + 1) % self.print_interval:
+                    print(f'epoch:{epoch + 1}/{self.num_epoch}, '
+                          f'loss:{loss:6.3f}, '
+                          f'train_acc:{train_acc:6.4f}, '
+                          f'vali_acc:{vali_acc:6.4f}, '
+                          f'time_elapsed:{time.time() - t_0:4.1f}')
+            else:
+                self.vali_acc_track.append(vali_acc)
+            update_cond1 = train_acc > max(self.sync_train_acc - 0.03, vali_acc - 0.02
+                                           ) and vali_acc > self.max_vali_acc
+            update_cond2 = (train_acc > self.sync_train_acc + 0.02) and (
+                    vali_acc > self.max_vali_acc - 0.01)
+            if update_cond1 or update_cond2:
+                self.second_best_net = dc(self.best_net)
+                self.best_net = dc(self.net)
+                self.max_vali_acc = vali_acc
+                self.sync_train_acc = train_acc
+                self.max_vali_epoch = epoch
+                if self.mode == 'train':
+                    print('-' * 50)
+                    print(f'\033[0;33;40mHere comes a higher vali_acc, epoch:{epoch + 1}/{self.num_epoch}, '
+                          f'loss:{loss:6.3f}, '
+                          f'train_acc:{train_acc:6.4f}, '
+                          f'vali_acc:{vali_acc:6.4f}\033[0m')
+                    print('-' * 50)
+            if self.early_stop:
+                if epoch - self.max_vali_epoch > self.early_stop:
+                    break
+        print('=' * 50)
+        print(f'\033[0;32mThe highest vali_acc is {self.max_vali_acc:6.4f}'
+              f' at {self.max_vali_epoch + 1} epoch!\033[0m')
+        return self.best_net, self.net, self.max_vali_acc, \
+               self.vali_acc_track, self.sync_train_acc, self.second_best_net
