@@ -1,2 +1,4 @@
-probiotic/.idea/
-probiotic/__pycache__/
+probiotic/.idea
+probiotic/__pycache__
+.idea/
+__pycache__/
