@@ -64,10 +64,10 @@ if __name__ == '__main__':
     )
     fig1, axes1 = plt.subplots(1, 3)
     plt.subplots_adjust(**test_ax_adjust)
-    fig1.set_size_inches([15.36, 8/2])
+    fig1.set_size_inches([15.36, 8 / 2])
     fig2, axes2 = plt.subplots(1, 3)
     plt.subplots_adjust(**test_ax_adjust)
-    fig2.set_size_inches([15.36, 8/2])
+    fig2.set_size_inches([15.36, 8 / 2])
     for i in range(3):
         title = n_test[i]
         _ = visualize(
@@ -86,7 +86,30 @@ if __name__ == '__main__':
         )
     fig1.savefig('figures/bagtower/test-lnr.png')
     fig2.savefig('figures/bagtower/test-lg.png')
-
+    plt.rc('font', family='Times New Roman', size=30)
+    fig_abs1, ax_abs1 = plt.subplots()
+    fig_abs2, ax_abs2 = plt.subplots()
+    fig_abs3, ax_abs3 = plt.subplots()
+    for i in range(3):
+        title = n_test[i]
+        _ = visualize(
+            ft_s_test[i], eval(f'ax_abs{i + 1}'),
+            ss_max=1, ss_min=1e-7, itv=human_itv,
+            title=title,
+            plot_scale='normal', r=None, c=None,
+            text_x=None, text_y=texts_y,
+            font_formula=fm.FontProperties(
+                math_fontfamily='cm', size=35),
+            font_text={'size': 33}, marker_scale=3,
+            r2_scale=3
+        )
+    abs_size = [20, 9]
+    fig_abs1.set_size_inches(abs_size)
+    fig_abs2.set_size_inches(abs_size)
+    fig_abs3.set_size_inches(abs_size)
+    fig_abs1.savefig('figures/bagtower/test_abs1.svg', transparent=True)
+    fig_abs2.savefig('figures/bagtower/test-abs2.svg', transparent=True)
+    fig_abs3.savefig('figures/bagtower/test-abs3.svg', transparent=True)
     # heatmap
     # old version, plot all heatmaps
     # xtick_labels_tv = ['1', '2', '4', '6', '7', '8']

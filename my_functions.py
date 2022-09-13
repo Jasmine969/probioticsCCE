@@ -8,8 +8,6 @@ from torch.nn.utils import rnn
 from matplotlib import font_manager as fm, pyplot as plt
 from sklearn.metrics import r2_score
 from copy import deepcopy as dc
-import sympy as sp
-from sympy.matrices import dense
 
 
 def collect_fn_added(data):
@@ -255,11 +253,16 @@ def visualize(
         text_x=None, text_y=None,
         ss_min=None, score_list=None,
         model=None,  # use partial to assign model
-        title=None
+        title=None, font_text=None, font_formula=None,
+        marker_scale=1, r2_scale=1
 ):
-    font_text = {'size': 17}
-    font_formula = fm.FontProperties(
-        math_fontfamily='cm', size=19)
+    if font_text is None:
+        font_text = {'size': 17}
+    if font_formula is None:
+        font_formula = fm.FontProperties(
+            math_fontfamily='cm', size=19)
+    font_r2 = fm.FontProperties(
+            math_fontfamily='cm', size=19 * r2_scale)
     font_legend = {'size': 14, 'math_fontfamily': 'cm'}
     ft, s, real_ind, length = pack_test(ft_s)
     with torch.no_grad():
@@ -286,17 +289,22 @@ def visualize(
             else:  # lg
                 pred = torch.clamp(pred, max=0).squeeze(0).cpu().numpy()
     t = np.arange(length[0])
-    ax = axes[c] if r is None else axes[r, c]
+    if r is not None:
+        ax = axes[r, c]
+    elif c is not None:
+        ax = axes[c]
+    else:
+        ax = axes
     ax.scatter(
         t[real_ind], s[real_ind],
-        marker='o', facecolor='white', s=90,
+        marker='o', facecolor='white', s=90 * marker_scale,
         color='r', label=r'ground truth $s^\mathrm{grd}$'
     )
     ax.scatter(
-        t[real_ind], pred[real_ind], s=90,
+        t[real_ind], pred[real_ind], s=90 * marker_scale,
         marker='v', label=r'predicted result of points $\hat{s}^{\mathrm{grd}}$'
     )
-    ax.plot(t, pred, '+', markersize=3,
+    ax.plot(t, pred, '+', markersize=3 * marker_scale,
             label=r'predicted result of interpolated labels $\hat{s}^{\mathrm{itp}}$')
     ax.set_xlabel('Time (s)', fontdict=font_text)
     if plot_scale == 'ori':
@@ -323,7 +331,7 @@ def visualize(
         try:
             r2 = r2_score(s[real_ind], pred[real_ind])
             ax.text(text_x, text_y, f'$R^2={r2:.4f}$',
-                    fontproperties=font_formula, horizontalalignment='center',
+                    fontproperties=font_r2, horizontalalignment='center',
                     verticalalignment='center', transform=ax.transAxes)
         except ValueError:
             ax.set_text(text_x, text_y, f'lg(negative)', horizontalalignment='center',
@@ -347,6 +355,8 @@ def least_square(x, y):
     y: output matrix, np.array
     return: coefficient
     """
+    import sympy as sp
+    from sympy.matrices import dense
     y = y.flatten()  # in case that y is a row vector
     assert y.ndim == 1
     y = y[..., None]
