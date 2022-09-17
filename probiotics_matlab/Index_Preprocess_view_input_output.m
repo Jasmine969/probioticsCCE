@@ -1,6 +1,6 @@
 clear;
 data = xlsread(...
-    'E:\\python_code\\Neural_Network\\probiotic\\excel\\itp_ft_s.xlsx', ...
+    'E:\\probioticsCCE\\probiotic\\excel\\itp_ft_s.xlsx', ...
     'Sheet1');
 ori_time = data(:,1); T = data(:,2); X = data(:,3); s = data(:,end-1);
 tag = logical(data(:,end));
@@ -68,7 +68,7 @@ h4_leg = legend({'$\tilde{s}^{\mathrm{grd}}$','$\tilde{s}^{\mathrm{itp}}$'}, ...
     'FontSize',legend_size,'Location','southwest');
 set(h4_leg,'Interpret','latex');
 h4.FontName = 'Times New Roman';h4.FontSize=tick_size;
-xlabel('Time (s)','FontName','Times New Roman','FontSize',text_size);
+xlabel('$\mathrm{Sequence~index~(}\Delta t=1~\mathrm{s)}$','Interpreter','latex','FontSize',text_size);
 ylabel('$\tilde{s}$','Interpreter','latex','FontSize',text_size);
 % ylim([0,1.1]);
 set(h4, 'ycolor',green,'yaxislocation', 'left');
