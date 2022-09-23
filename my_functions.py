@@ -262,7 +262,7 @@ def visualize(
         font_formula = fm.FontProperties(
             math_fontfamily='cm', size=19)
     font_r2 = fm.FontProperties(
-            math_fontfamily='cm', size=19 * r2_scale)
+        math_fontfamily='cm', size=19 * r2_scale)
     font_legend = {'size': 14, 'math_fontfamily': 'cm'}
     ft, s, real_ind, length = pack_test(ft_s)
     with torch.no_grad():
@@ -353,7 +353,7 @@ def least_square(x, y):
     """
     x: input matrix, np.array
     y: output matrix, np.array
-    return: coefficient
+    return: slope and
     """
     import sympy as sp
     from sympy.matrices import dense
@@ -362,4 +362,18 @@ def least_square(x, y):
     y = y[..., None]
     res = sp.Matrix(np.c_[np.dot(x.T, x), np.dot(x.T, y)]).rref()[0]
     res = dense.matrix2numpy(res).astype(float)
-    return res[0, -1]
+    return res[:, -1]
+
+
+def is_pareto_efficient_simple(costs):
+    """
+    Find the pareto-efficient points
+    :param costs: An (n_points, n_costs) array
+    :return: A (n_points, ) boolean array, indicating whether each point is Pareto efficient
+    """
+    is_efficient = np.ones(costs.shape[0], dtype=bool)
+    for i, c in enumerate(costs):
+        if is_efficient[i]:
+            is_efficient[is_efficient] = np.any(costs[is_efficient] < c, axis=1)  # Keep any point with a lower cost
+            is_efficient[i] = True  # And keep self
+    return is_efficient

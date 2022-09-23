@@ -67,6 +67,7 @@ def vary_pred_plot(
     # ax[0, 0].set_title('(a) droplet temperature', fontdict=font_title, y=y_title)
     ax[0, 1].set_xlabel('Time (s)', fontdict=font_text)
     ax[0, 1].set_ylabel(r'$X~(\mathrm{kg/kg})$', fontproperties=font_formula)
+    t02 = []  # time elapsed when s reached 0.2
     # fig0, ax0 = plt.subplots()  # use in paper structure
     # ax[0, 1].set_title('(b) moisture content on the dry basis', fontdict=font_title, y=y_title)
     for i, vary_val in enumerate(exp_cond[vary_param]):
@@ -115,12 +116,13 @@ def vary_pred_plot(
         # # ax[1, 0].plot(t[:-1], x[1:, 1] - x[:-1, 1], label=label) dT/dt
         ax[1, 1].plot(t, np.log10(pred), label=label, marker=marker,
                       markersize=markersize, markevery=marker_sep)
+        t02.append((pred > 0.2).sum())
         # ax1.plot(t, rate, marker=marker,
         #          markersize=markersize, markevery=marker_sep)
         # ax0.plot(t, np.log10(pred.flatten()), label=label, lw=2, marker=marker,
         #          markersize=markersize * 1.5, markevery=marker_sep)  # use in paper structure
-    # handles, labels = ax[0, 0].get_legend_handles_labels()
-    # fig.legend(handles, labels, loc='center left', prop=font_legend)
+    handles, labels = ax[0, 0].get_legend_handles_labels()
+    fig.legend(handles, labels, loc='center left', prop=font_legend)
     # ax1.legend(handles, labels, loc='best', prop=font_legend)
     # ax[0, 0].legend(loc='best', prop=font_legend)
     # ax[0, 1].legend(loc='best', prop=font_legend)
@@ -128,7 +130,7 @@ def vary_pred_plot(
     # ax[1, 1].legend(loc='best', prop=font_legend)
     fig.set_size_inches([15.36, 7.57])
     # fig1.set_size_inches([9.04, 6.64])
-    return fig, ax, \
+    return fig, ax, t02 \
         # time_avg_rate, fig1, ax1
 
 
