@@ -5,45 +5,72 @@ from matplotlib import cm
 from matplotlib import font_manager as fm
 from matplotlib.ticker import AutoMinorLocator
 import pickle
-from my_functions import is_pareto_efficient_simple
-import pandas as pd
+from my_functions import is_pareto_efficient_simple, split_discontinuity
 from mpl_toolkits.axes_grid1 import host_subplot
 from mpl_toolkits import axisartist
+import torch
 
 
 def x2ws(x):
     return 1 / (x + 1) * 100
 
 
-with open('../pickle_data/monte-carlo-dry-ta90-dur200.pkl', 'rb') as pf:
+with open('../pickle_data/monte-carlo-dry-5w.pkl', 'rb') as pf:
     data_mc = pickle.load(pf)
 
 # mode = 'zh'  # chinese
 mode = 'eng'
-# data_mc = data_mc[data_mc[:, 0] <= 1 / 0.7 - 1]  # ws>=70%
-data_mc = data_mc[data_mc[:, 1] >= 0]  # s>=0.1
+
+# process experimental points
+with open('../pickle_data/test35_s_non-tilde.pkl', 'rb') as pf1:
+    dict_exp = pickle.load(pf1)
+    ft_s_tv = dict_exp['ft_s_tv']
+    ft_scaler = dict_exp['ft_scalar']
+with open('../pickle_data/test35_lgg_s.pkl', 'rb') as pf:
+    ft_s_test = pickle.load(pf)
+ft_s = torch.vstack(ft_s_tv + ft_s_test).numpy()[:, :-1]
+ft_s[:, :3] = ft_scaler.inverse_transform(ft_s[:, :3])
+ft_s[:, 2] = np.clip(1 / (ft_s[:, 2] + 1) * 100, a_min=0, a_max=100)
+
 data_mc[:, 4] *= 100
+data_mc = data_mc[data_mc[:, 2] <= 90]
 plt.rc('font', family='Times New Roman', size=24)
 font_formula = dict(math_fontfamily='cm', size=30)
-font_legend = dict(family='SimHei', size=24)
+font_legend = dict(family='Times New Roman', size=24)
 font_text = {'size': 34}
 font_text_zh = {'size': 31, 'family': 'SimHei'}
 
 pure_mc_xs = data_mc[:, [0, 1]]
-pure_mc_xs[:, 1] *= -1
-is_pareto_mc = is_pareto_efficient_simple(pure_mc_xs)
+pure_mc_xs[:, 0] = x2ws(pure_mc_xs[:, 0])
+is_pareto_mc = is_pareto_efficient_simple(
+    pure_mc_xs, constraint=([90, 100], [0.65, 1]))
 data_mc[:, 0] = x2ws(data_mc[:, 0])
 mc_pareto = data_mc[is_pareto_mc, :]
 non_pareto = data_mc[~is_pareto_mc, :]
 fig_pareto = plt.figure(figsize=(9, 7.4))
-plt.scatter(non_pareto[:, 0], non_pareto[:, 1],
-            c='#ff7f0e', alpha=0.3, s=40, marker='s')
-plt.scatter(mc_pareto[:, 0], mc_pareto[:, 1], s=40,
-            c='#1f77b4', marker='s')
-plt.xlabel(r'$w_{\mathrm{s}}~(\mathrm{wt\%})$', fontdict=font_formula)
-plt.ylabel(r'$s$', fontdict=font_formula)
-# plt.gcf().savefig('../figures/vary_inp/pareto-mc.png', transparent=True)
-plt.close(fig_pareto)
+plt.scatter(
+    data_mc[:, 0], data_mc[:, 1], facecolor='w',
+    edgecolor='#B5E3DB', alpha=0.9, s=80, marker='s',
+)
+plt.scatter(
+    mc_pareto[:, 0], mc_pareto[:, 1], s=60,
+    c='#FF0000', marker='*'
+)
+plt.scatter(
+    ft_s[:, 2], ft_s[:, -1],
+    c='#A4D0F4', alpha=0.7, s=40, marker='>',
+)
+# plt.legend(loc='best', prop=font_legend, handletextpad=0.06)
+plt.plot([90, 90], [0, 1], '--', color='k')
+plt.plot([0, 100], [0.65, 0.65], '--', color='k')
+plt.xlim([0, 100])
+plt.ylim([0, 1])
+
+plt.xlabel(r'$\mathrm{Objective~2:~}w_{\mathrm{s}}~(\mathrm{wt\%})$', fontdict=font_formula)
+plt.ylabel(r'$\mathrm{Objective~1:~}s$', fontdict=font_formula)
+plt.subplots_adjust(bottom=0.136)
+plt.gcf().savefig('../figures/vary_inp/pareto-mc.png', transparent=True)
+# plt.close(fig_pareto)
 
 # hist of ta
 var2col = {'ta': 2, 'va': 3, 'ws': 4, 'vd': 5, 't': 6}
@@ -70,12 +97,12 @@ def hist_scatter_var(
 
 
 markersize = 15
-fig_num = 1
+fig_num = 2
 
 
 def hist_var(data_pareto, var_name, xlabel, bins,
              x_minor_num, xticks, yticks=None,
-             y_minor_num=2, log=False):
+             y_minor_num=2, log=False, xlim=None):
     global fig_num
     plt.figure(fig_num, figsize=(15, 7))
     fig_num += 1
@@ -94,10 +121,10 @@ def hist_var(data_pareto, var_name, xlabel, bins,
     y_minor_locator = AutoMinorLocator(y_minor_num)
     host.yaxis.set_minor_locator(y_minor_locator)
     host.hist(
-        [each[:, var2col[var_name]] for each in data_pareto],
-        bins=bins, log=log,
-        alpha=0.3, edgecolor='k',
-        stacked=False
+        data_pareto[1][:, var2col[var_name]],
+        bins=bins, log=False,
+        alpha=0.3, edgecolor='k', facecolor='C1',
+        # stacked=False
     )
     # host.set_xlabel(xlabel, fontdict=font_formula)
     # if mode == 'zh':
@@ -119,40 +146,52 @@ def hist_var(data_pareto, var_name, xlabel, bins,
     mean_non = df_non.groupby(by='pos').mean().dropna()
     x_mean_non = [each.mid for each in mean_non.index]
     y_mean_non = mean_non.iloc[:, :2].to_numpy()
-    par_X.plot(x_mean_pareto, y_mean_pareto[:, 0], '*-', color='C0', markersize=markersize)
+    x_means_pareto, y_means_pareto = split_discontinuity(
+        np.array(x_mean_pareto), bins[1] - bins[0], y_mean_pareto
+    )
     par_X.plot(x_mean_non, y_mean_non[:, 0], '*-', color='C1', markersize=markersize)
-    par_s.plot(x_mean_pareto, y_mean_pareto[:, 1], '>--', color='C0', markersize=markersize)
     par_s.plot(x_mean_non, y_mean_non[:, 1], '>--', color='C1', markersize=markersize)
+    for x_mean_pareto, y_mean_pareto in zip(x_means_pareto, y_means_pareto):
+        par_X.plot(x_mean_pareto, y_mean_pareto[:, 0], '*-', color='C0', markersize=markersize)
+        par_s.plot(x_mean_pareto, y_mean_pareto[:, 1], '>--', color='C0', markersize=markersize)
+    par_X.set_ylim([20, 100])
+    par_s.set_ylim([0, 1])
+    if xlim is not None:
+        host.set_xlim(xlim)
     return plt.gcf(), plt.gca()
 
 
-# mc hist
-fig_ta_op, _ = hist_var([mc_pareto, non_pareto], 'ta', r'$T_\mathrm{a}~\mathrm{(^\circ\hspace{-0.25}C)}$',
-                        x_minor_num=5, bins=list(range(60, 110, 2)),
-                        xticks=list(range(60, 111, 10)), log=True,
-                        y_minor_num=5)
-# fig_ta_op.savefig('../figures/vary_inp/vary_ta_pareto-op.png', transparent=True)
-# fig_va_op, _ = hist_var([mc_pareto, non_pareto], 'va', r'$v_\mathrm{a}~\mathrm{(m/s)}$',
-#                         x_minor_num=3, bins=np.arange(0.45, 1.05, 0.05),
-#                         xticks=[0.45, 0.6, 0.75, 0.9, 1.05], log=True,
-#                         y_minor_num=5)
-# fig_va_op.savefig('../figures/vary_inp/vary_va_pareto-op.png', transparent=True)
-# fig_ws_op, _ = hist_var([mc_pareto, non_pareto], 'ws', r'$w_\mathrm{s}~\mathrm{(wt\%)}$',
-#                         x_minor_num=4, bins=np.arange(5.5, 20.1, 0.5),
-#                         xticks=[4, 6, 8, 10, 12, 14, 16, 18, 20], log=True
-#                         )
-# fig_ws_op.savefig('../figures/vary_inp/vary_ws_pareto-op.png', transparent=True)
-# fig_vd_op, _ = hist_var([mc_pareto, non_pareto], 'vd', r'$V_\mathrm{d}~\mathrm{(\mu L)}$',
-#                         x_minor_num=5, bins=np.arange(0.5, 2.5, 0.1),
-#                         xticks=np.arange(0.5, 2.51, 0.5), log=True
-#                         )
-# fig_vd_op.savefig('../figures/vary_inp/vary_vd_pareto-op.png', transparent=True)
-# fig_t_op, _ = hist_var([mc_pareto, non_pareto], 't', r'$t~\mathrm{(s)}$',
-#                        x_minor_num=5, bins=np.arange(50, 300, 10),
-#                        xticks=list(range(50, 301, 50))
-#                        )
-# fig_t_op.savefig('../figures/vary_inp/vary_t_pareto-op.png', transparent=True)
-
+# # mc hist
+# fig_ta_op, _ = hist_var(
+#     [mc_pareto, data_mc], 'ta', r'$T_\mathrm{a}~\mathrm{(^\circ\hspace{-0.25}C)}$',
+#     x_minor_num=5, bins=list(range(50, 91, 1)),
+#     xticks=list(range(50, 100, 5)), log=True, xlim=[48, 92]
+# )
+# fig_ta_op.savefig('../figures/vary_inp/vary_ta_pareto.png', transparent=True)
+# fig_va_op, _ = hist_var(
+#     [mc_pareto, data_mc], 'va', r'$v_\mathrm{a}~\mathrm{(m/s)}$',
+#     x_minor_num=4, bins=np.arange(0., 2.01, 0.05),
+#     xticks=np.arange(0, 2.01, 0.2), log=True
+# )
+# fig_va_op.savefig('../figures/vary_inp/vary_va_pareto.png', transparent=True)
+# fig_ws_op, _ = hist_var(
+#     [mc_pareto, data_mc], 'ws', r'$w_\mathrm{s}~\mathrm{(wt\%)}$',
+#     x_minor_num=5, bins=np.arange(5, 30.1, 1),
+#     xticks=[0, 5, 10, 15, 20, 25, 30], log=True
+# )
+# fig_ws_op.savefig('../figures/vary_inp/vary_ws_pareto.png', transparent=True)
+# fig_vd_op, _ = hist_var(
+#     [mc_pareto, data_mc], 'vd', r'$V_\mathrm{d}~\mathrm{(\mu L)}$',
+#     x_minor_num=5, bins=np.arange(0.5, 3.1, 0.1),
+#     xticks=np.arange(0.5, 3.01, 0.5), log=True
+# )
+# fig_vd_op.savefig('../figures/vary_inp/vary_vd_pareto.png', transparent=True)
+# fig_t_op, _ = hist_var(
+#     [mc_pareto, data_mc], 't', r'$t~\mathrm{(s)}$',
+#     x_minor_num=5, bins=np.arange(50, 301, 10),
+#     xticks=list(range(50, 301, 50)), log=True
+# )
+# fig_t_op.savefig('../figures/vary_inp/vary_t_pareto.png', transparent=True)
 
 # # mc-mc scatter
 # fig_ta_s, _ = hist_scatter_var(

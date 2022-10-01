@@ -25,5 +25,10 @@ for i in range(8):
     #           df_1s['t(s)'].to_numpy(), df_1s['itp'].to_numpy(),
     #           df_1s['s_ub'].to_numpy(), df_1s['s_lb'].to_numpy(), pos=(i // 2, i % 2))
     df_1s.to_excel(writer, index=None, sheet_name='Sheet' + str(i + 1))
+    df_1s['ws'] = df_1s['X'].apply(lambda x: 1 / (x + 1) * 100)
+    try:
+        print(f"G{i+1}: {df_1s[df_1s['ws'] > 90].iloc[0, -3]}")
+    except Exception:
+        print(f'G{i+1}: None')
 writer.save()
 plt.show()

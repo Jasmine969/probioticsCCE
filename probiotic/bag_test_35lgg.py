@@ -104,12 +104,12 @@ if __name__ == '__main__':
             r2_scale=3
         )
     abs_size = [20, 9]
-    fig_abs1.set_size_inches(abs_size)
+    # fig_abs1.set_size_inches(abs_size)
     fig_abs2.set_size_inches(abs_size)
-    fig_abs3.set_size_inches(abs_size)
-    fig_abs1.savefig('figures/bagtower/test_abs1.svg', transparent=True)
-    fig_abs2.savefig('figures/bagtower/test-abs2.svg', transparent=True)
-    fig_abs3.savefig('figures/bagtower/test-abs3.svg', transparent=True)
+    # fig_abs3.set_size_inches(abs_size)
+    fig_abs1.savefig('figures/bagtower/test_abs1.png', transparent=True)
+    fig_abs2.savefig('figures/bagtower/test-abs2.png', transparent=True)
+    fig_abs3.savefig('figures/bagtower/test-abs3.png', transparent=True)
     # heatmap
     # old version, plot all heatmaps
     # xtick_labels_tv = ['1', '2', '4', '6', '7', '8']

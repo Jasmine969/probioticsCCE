@@ -162,6 +162,7 @@ def sdd(l, w, Ta, pMass0, dp0, va, ms, ws, Y):
     if nx >= 0:
         dmdt = hm * Ap * (rhoS - rhoF)
     dTpdt = (h * (Ta - TpNow) * Ap - (dmdt * HL)) / (pMass * Cpd)
+    print(AH)
     # -----------------------------------
     # C1 = 1.63 + 0.54 * (va * rho / mu) ** 0.5 * Sc ** (1 / 3)
     # print(1)

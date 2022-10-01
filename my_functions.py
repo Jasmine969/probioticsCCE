@@ -1,4 +1,6 @@
 import math
+
+import pandas as pd
 from torch import nn
 from torch.utils.data import Dataset
 import torch
@@ -306,14 +308,14 @@ def visualize(
     )
     ax.plot(t, pred, '+', markersize=3 * marker_scale,
             label=r'predicted result of interpolated labels $\hat{s}^{\mathrm{itp}}$')
-    ax.set_xlabel('Time (s)', fontdict=font_text)
+    # ax.set_xlabel('Time (s)', fontdict=font_text)
     if plot_scale == 'ori':
         y_label = 'ori'
     elif plot_scale == 'normal':
         y_label = r'$s$'
     else:
         y_label = r'$\lg{s}$'
-    ax.set_ylabel(y_label, fontproperties=font_formula)
+    # ax.set_ylabel(y_label, fontproperties=font_formula)
     # tick specification
     # xlim = ax.get_xlim()
     # ylim = ax.get_ylim()
@@ -355,25 +357,64 @@ def least_square(x, y):
     y: output matrix, np.array
     return: slope and
     """
-    import sympy as sp
-    from sympy.matrices import dense
     y = y.flatten()  # in case that y is a row vector
     assert y.ndim == 1
     y = y[..., None]
-    res = sp.Matrix(np.c_[np.dot(x.T, x), np.dot(x.T, y)]).rref()[0]
-    res = dense.matrix2numpy(res).astype(float)
-    return res[:, -1]
+    res = np.linalg.solve(np.dot(x.T, x), np.dot(x.T, y))
+    return res
 
 
-def is_pareto_efficient_simple(costs):
+def is_pareto_efficient_simple(income, constraint):
     """
     Find the pareto-efficient points
-    :param costs: An (n_points, n_costs) array
+    :param income: An (n_points, n_income) array
+    :param constraint: ([min1, max1], [min2, max2])
     :return: A (n_points, ) boolean array, indicating whether each point is Pareto efficient
     """
-    is_efficient = np.ones(costs.shape[0], dtype=bool)
-    for i, c in enumerate(costs):
+    is_efficient = np.ones(income.shape[0], dtype=bool)
+    for i, c in enumerate(income):
         if is_efficient[i]:
-            is_efficient[is_efficient] = np.any(costs[is_efficient] < c, axis=1)  # Keep any point with a lower cost
+            is_efficient[is_efficient] = np.any(income[is_efficient] > c, axis=1)  # Keep any point with a higher income
             is_efficient[i] = True  # And keep self
-    return is_efficient
+    inside_range = []
+    for col, col_val in enumerate(constraint):
+        inside_range.append((income[:, col] >= col_val[0]) & (income[:, col] <= col_val[1]))
+    return is_efficient & inside_range[0] & inside_range[1]
+
+
+def split_discontinuity(x: np.ndarray, step: float, y: np.ndarray = None):
+    """
+    :param x: data to be split, e.g., [0.1, 0.2, 0.5, 0.8, 0.9, 1.0]
+    :param step: e.g., 0.1, then continuous version is [0.1, 0.2, 0.3, ..., 1.0]
+    :param y: dependent var
+    :return: split data, e.g., ([0.1, 0.2], [0.5], [0.8, 0.9, 1.0]) and y if needed
+    """
+    digit = int(np.abs(np.log(step)))
+    step = np.around(step, digit)
+    diff = np.around(x[1:] - x[:-1], digit)
+    cut_off = x[:-1][diff != step] + step / 10
+    # noinspection PyArgumentList
+    grp_inds = pd.cut(x, [
+        x.min() - 1] + cut_off.tolist() + [x.max() + 1], labels=False)
+    if grp_inds.sum() == 0:
+        if y is not None:
+            return [x], [y]
+        return [x]
+    res_x = []
+    if y is not None:
+        assert y.ndim == 2 and grp_inds.size == y.shape[0]
+        res_y = []
+        for grp_ind in set(grp_inds):
+            res_x.append(x[grp_inds == grp_ind])
+            res_y.append(y[grp_inds == grp_ind, :])
+        return res_x, res_y
+    for grp_ind in set(grp_inds):
+        res_x.append(x[grp_inds == grp_ind])
+    return res_x
+
+
+if __name__ == '__main__':
+    X = np.random.randn(10, 3)
+    y = np.random.rand(10)
+    r = least_square(X, y)
+    print(r)
